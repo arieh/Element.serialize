@@ -6,4 +6,7 @@ How to use
 ----------
 
     #JS
-    var values = $('myForm').serialize();
+    var values = $('myForm').serialize(deep);
+    
+The deep argument specifies if you want the to enable deep parsing. This is useful if your form contains query arrays, and you want them to be parsed hierarchically.
+For more examples look at the demo

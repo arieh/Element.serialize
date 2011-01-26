@@ -39,18 +39,32 @@ THE SOFTWARE
 (function(window,$,undef){
 
 Element.implement({
-    serialize : function serialize(){
+    serialize : function serialize(deep){
         var results = {}, inputs = this.getElements('input, select, textarea');
 
         inputs.each(function(el){
-            var type = el.type;
+            var type = el.type, names =[], name = el.name, current;
             if (!el.name || el.disabled || type == 'submit' || type == 'reset' || type == 'file' || type == 'image') return;
 
             var value = (el.get('tag') == 'select') ? el.getSelected().map(function(opt){
                 return $(opt).get('value');
             }) : ((type == 'radio' || type == 'checkbox') && !el.checked) ? null : el.get('value');
             
-            if (value) results[el.name] = value;
+            if (!value || value.length < 1) return;
+            
+            if (deep){
+                names = name.split('[');
+                if (names.length == 1) results[name] = value;
+                else{
+                    current = results;
+                    for (var i=0,l=names.length-1; i<l;i++){
+                        name = names[i].replace(']','');
+                        if (!current[name]) current[name] = current = {};
+                        else current = current[name];
+                    }
+                    current[names[names.length-1].replace(']','')] = value;
+                }
+            }else results[el.name] = value;
         });
         
         return results;
