@@ -8,7 +8,7 @@ authors:
 - Arieh Glazer
 
 requires:
-- core/1.2.4 : [Class, Class.Extras, Element]
+- core/1.2.4 : [Element]
 
 provides: [Element.serialize]
 
@@ -37,14 +37,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE
 */
 (function(window,$,undef){
-var Element.serialize = this.{Element.serialize} = new Class({
-	Implements : [Options],
-	options : {
-		
-	},
-	initialize : function(options){
-		
-	}
+
+Element.implement({
+    serialize : function serialize(){
+        var results = {}, inputs = this.getElements('input, select, textarea');
+
+        inputs.each(function(el){
+            var type = el.type;
+            if (!el.name || el.disabled || type == 'submit' || type == 'reset' || type == 'file' || type == 'image') return;
+
+            var value = (el.get('tag') == 'select') ? el.getSelected().map(function(opt){
+                return $(opt).get('value');
+            }) : ((type == 'radio' || type == 'checkbox') && !el.checked) ? null : el.get('value');
+            
+            if (value) results[el.name] = value;
+        });
+        
+        return results;
+    }
 });
 
 })(this,document.id);
